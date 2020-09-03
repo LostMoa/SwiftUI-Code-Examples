@@ -8,7 +8,6 @@ struct Cell: Identifiable, Hashable {
 }
 
 struct ContentView: View {
-    
     @State var list: [Cell] = Array(repeating: Cell(), count: 7)
     
     var body: some View {
@@ -41,56 +40,46 @@ struct ContentView: View {
 }
 
 class CustomTextView: UITextView {
-    
     var dynamicHeightTextField: DynamicHeightTextField?
     
     override func didMoveToWindow() {
         let size = sizeThatFits(bounds.size)
         if dynamicHeightTextField?.height != size.height {
-            dynamicHeightTextField!.height = size.height
+            dynamicHeightTextField?.height = size.height
         }
     }
 }
 
-struct DynamicHeightTextField: UIViewRepresentable {
+struct DynamicHeightTextField: UIViewRepresentable { 
     @Binding var text: String
     @Binding var height: CGFloat
     
     func makeUIView(context: Context) -> CustomTextView {
         let textView = CustomTextView()
         textView.dynamicHeightTextField = self
-        
         textView.isScrollEnabled = true
         textView.alwaysBounceVertical = false
         textView.isEditable = true
         textView.isUserInteractionEnabled = true
-        
         textView.backgroundColor = UIColor.clear
         
-
         context.coordinator.textView = textView
         
         textView.delegate = context.coordinator
         textView.layoutManager.delegate = context.coordinator
-        
         textView.text = text
         
         textView.gestureRecognizers = textView.gestureRecognizers?.filter{
-            if $0 is UIPanGestureRecognizer {
-                return false
-            }
-            return true
+            !($0 is UIPanGestureRecognizer)
         }
-        
-        
+
         return textView
     }
     
     func updateUIView(_ uiView: CustomTextView, context: Context) {
         uiView.text = text
     }
-    
-    
+
     func makeCoordinator() -> Coordinator {
         return Coordinator(dynamicSizeTextField: self)
     }
@@ -102,8 +91,7 @@ class Coordinator: NSObject, UITextViewDelegate, NSLayoutManagerDelegate {
     var dynamicHeightTextField: DynamicHeightTextField
     
     weak var textView: UITextView?
-    
-    
+
     init(dynamicSizeTextField: DynamicHeightTextField) {
         self.dynamicHeightTextField = dynamicSizeTextField
     }
@@ -121,7 +109,6 @@ class Coordinator: NSObject, UITextViewDelegate, NSLayoutManagerDelegate {
     }
     
     func layoutManager(_ layoutManager: NSLayoutManager, didCompleteLayoutFor textContainer: NSTextContainer?, atEnd layoutFinishedFlag: Bool) {
-        
         DispatchQueue.main.async { [weak self] in
             guard let textView = self?.textView else {
                 return
@@ -130,8 +117,7 @@ class Coordinator: NSObject, UITextViewDelegate, NSLayoutManagerDelegate {
             if self?.dynamicHeightTextField.height != size.height {
                 self?.dynamicHeightTextField.height = size.height
             }
-        }
-        
+        }    
     }
 }
 

@@ -27,7 +27,7 @@ struct DynamicHeightTextField: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UITextView, context: Context) {
-        uiView.text = text
+        
     }
 
     
